@@ -7,5 +7,5 @@ PHP
 #### $ crontab -l
 
 ```
-0 */3 * * * php /server/sarrafchi.ir/sub-crawler/parse.php
+0 */3 * * * php /path/to/dir/parse.php
 ```
