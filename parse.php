@@ -8,13 +8,11 @@ require "_core.php";
 $page=1;
 $pageTotal=500;
 $pageLink="https://www.eghtesadonline.com/newsstudios/archive/?curp=1&categories=7&order=order_time&page=1&curps=1";
+
 while($page<=$pageTotal) {
 	print "\nPage $page\n";
 	$input=get($pageLink);
-	// print_r($input);
 	preg_match_all('/<h3 itemprop="headLine">(\s*|)<a class="([^\"]+|)" href="\/([^\/]+)\/(?<id>[0-9]+)-(?<slug>[^\"]+)"([^\>]+|)>(\s*|)(?<title>[^\<]+)(\s*|)<\/a>/i', $input[0], $matches);
-	// preg_match_all('/<h3 itemprop="headLine">(\s*|)<a class="([^\"]+|)" href="\/بخش-%D8%B7%D9%84%D8%A7-%D8%A7%D8%B1%D8%B2-7\/(?<id>[0-9]+)-(?<slug>[^\"]+)"([^\>]+|)>(\s*|)(?<title>[^\<]+)(\s*|)<\/a>/i', $input[0], $matches);
-	// print_r($matches);
 	foreach($matches["id"] as $i=>$id) {
 		$slug=$matches["slug"][$i];
 		$title=$matches["title"][$i];
@@ -36,7 +34,6 @@ function parse_post($link, $id, $slug, $title) {
 		return;
 	}
 	$input=_get($link);
-	// print_r($input);
 
 	preg_match('/<h2 class="fn14 clr10 pt8">(\s*|)(?<subtitle>[^\<]+)(\s*|)<\/h2>/i', $input[0], $subtitle);
 	if(isset($subtitle["subtitle"])) {
@@ -62,8 +59,6 @@ function parse_post($link, $id, $slug, $title) {
 		$subtext=null;
 	}
 
-	# preg_match('/<\!\-\- news-content \-\->(?<text>.*?)<\!\-\- news-content \-\->/i', $input[0], $text);
-	// print_r($text);
 	preg_match('/"description":(\s*|)"(?<text>[^\"]+)"/i', $input[0], $text);
 	if(isset($text["text"])) {
 		$text=$text["text"];
@@ -74,10 +69,9 @@ function parse_post($link, $id, $slug, $title) {
 	}
 
 	preg_match('/>(\s*|)(?<date>[^\<]+)(\s*|)<\/time>(\s*|)<\/div>(\s*|)<\!-- date-news -->/i', $input[0], $date);
+
 	$date=$date["date"];
-	// print $date."\n";
 	$dates = explode(" ", $date);
-	// print_r($dates);
 	$date = convert2english(trim($dates[0]));
 	$time = convert2english(trim($dates[2]));
 
@@ -85,24 +79,11 @@ function parse_post($link, $id, $slug, $title) {
 	if(preg_match('/"@type":(\s*|)"VideoObject"/i', $input[0])) {
 
 		preg_match('/"contentUrl":(\s*|)"(\s*|)(?<video>[^\"]+)"/i', $input[0], $video);
-		// print_r($video);
 		$video=$video["video"];
 
 		preg_match('/"thumbnailUrl":(\s*|)"(\s*|)(?<image>[^\"]+)"/i', $input[0], $image);
-		// print_r($image);
 		$image=$image["image"];
 	}
-
-	// print_r($id);
-	// print_r($title);
-	// print_r($subtitle);
-	// print_r($image);
-	// print_r($subtext);
-	// print_r($text);
-	// print_r($date);
-	// print $link."\n";
-	// exit();
-	// return;
 
 	$values=[
 		"title"=>$title,
@@ -119,17 +100,10 @@ function parse_post($link, $id, $slug, $title) {
 		"video"=>$video,
 	];
 	// print_r($values);
-	// return;
 	if($db->count("news", ["source_id"=>$id])>0) {
 		$db->update("news", ["source_id"=>$id], $values);
 	}
 	else {
 		$db->insert("news", $values);
 	}
-}
-
-function _get($link) {
-	return get($link);
-	exec("curl '$link' > output.html");
-	return file_get_contents("output.html");
 }
