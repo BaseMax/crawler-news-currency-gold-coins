@@ -4,11 +4,7 @@
 
 require "NetPHP.php";
 
-require "phpedb.php";
-
-$db=new database();
-$db->db="database_name"; // MODIFY
-$db->connect("localhost", "root", "*****"); // MODIFY
+require "_core.php";
 
 $page=1;
 $pageTotal=500;
@@ -32,6 +28,7 @@ while($page<=$pageTotal) {
 	}
 	$page++;
 }
+
 function parse_post($link, $id, $slug, $title) {
 	print $link."\n";
 	global $db;
@@ -123,6 +120,7 @@ function parse_post($link, $id, $slug, $title) {
 		$db->insert("news", $values);
 	}
 }
+
 function _get($link) {
 	return get($link);
 	exec("curl '$link' > output.html");
