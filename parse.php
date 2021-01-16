@@ -3,7 +3,6 @@
 // https://github.com/BaseMax/crawler-news-currency-gold-coins/new/main
 
 require "NetPHP.php";
-
 require "_core.php";
 
 $page=1;
@@ -11,9 +10,10 @@ $pageTotal=500;
 $pageLink="https://www.eghtesadonline.com/newsstudios/archive/?curp=1&categories=7&order=order_time&page=1&curps=1";
 while($page<=$pageTotal) {
 	print "\nPage $page\n";
-	$input=_get($pageLink);
+	$input=get($pageLink);
 	// print_r($input);
-	preg_match_all('/<h3 itemprop="headLine">(\s*|)<a class="fnb fn14 clr04" href="\/بخش-%D8%B7%D9%84%D8%A7-%D8%A7%D8%B1%D8%B2-7\/(?<id>[0-9]+)-(?<slug>[^\"]+)"([^\>]+|)>(\s*|)(?<title>[^\<]+)(\s*|)<\/a>/i', $input[0], $matches);
+	preg_match_all('/<h3 itemprop="headLine">(\s*|)<a class="([^\"]+|)" href="\/([^\/]+)\/(?<id>[0-9]+)-(?<slug>[^\"]+)"([^\>]+|)>(\s*|)(?<title>[^\<]+)(\s*|)<\/a>/i', $input[0], $matches);
+	// preg_match_all('/<h3 itemprop="headLine">(\s*|)<a class="([^\"]+|)" href="\/بخش-%D8%B7%D9%84%D8%A7-%D8%A7%D8%B1%D8%B2-7\/(?<id>[0-9]+)-(?<slug>[^\"]+)"([^\>]+|)>(\s*|)(?<title>[^\<]+)(\s*|)<\/a>/i', $input[0], $matches);
 	// print_r($matches);
 	foreach($matches["id"] as $i=>$id) {
 		$slug=$matches["slug"][$i];
@@ -75,6 +75,11 @@ function parse_post($link, $id, $slug, $title) {
 
 	preg_match('/>(\s*|)(?<date>[^\<]+)(\s*|)<\/time>(\s*|)<\/div>(\s*|)<\!-- date-news -->/i', $input[0], $date);
 	$date=$date["date"];
+	// print $date."\n";
+	$dates = explode(" ", $date);
+	// print_r($dates);
+	$date = convert2english(trim($dates[0]));
+	$time = convert2english(trim($dates[2]));
 
 	$video=null;
 	if(preg_match('/"@type":(\s*|)"VideoObject"/i', $input[0])) {
@@ -107,12 +112,14 @@ function parse_post($link, $id, $slug, $title) {
 		"source_id"=>$id,
 		"link"=>$link,
 		"date"=>$date,
+		"time"=>$time,
 		"image"=>$image,
 		"subtext"=>$subtext,
 		"text"=>$text,
 		"video"=>$video,
 	];
-
+	// print_r($values);
+	// return;
 	if($db->count("news", ["source_id"=>$id])>0) {
 		$db->update("news", ["source_id"=>$id], $values);
 	}
