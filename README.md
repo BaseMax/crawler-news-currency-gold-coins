@@ -1,6 +1,6 @@
 # crawler-news-currency-gold-coins
 
-PHP
+PHP Crawler to get Persian news related to currency coin and gold. 
 
 ### Database
 
