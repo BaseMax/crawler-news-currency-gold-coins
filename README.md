@@ -2,6 +2,8 @@
 
 PHP Crawler to get Persian news related to currency coin and gold. 
 
+You can see the output of this program in (this database file)[database-news.sql].
+
 ### Database
 
 ```sql
